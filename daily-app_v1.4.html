@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Innerlijk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#F7F4EF; --bg2:#EFEAE1;
+  --ink:#1A1714; --ink2:#6B6560; --ink3:#A8A29C;
+  --accent:#C4742A; --accent-light:#F0E4D4;
+  --line:#E0D9CF; --white:#FDFCFA;
+  --radius:16px; --green:#EEF4EE; --green-ink:#2D5A2D;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;max-width:430px;margin:0 auto;overflow-x:hidden}
+
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.active{display:flex;animation:fadeUp .28s cubic-bezier(.22,1,.36,1)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.icon-btn{width:38px;height:38px;background:var(--white);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.07);color:var(--ink2);flex-shrink:0;transition:background .15s}
+.icon-btn:active{background:var(--bg2)}
+.icon-btn svg{width:17px;height:17px;display:block}
+.close-btn{width:38px;height:38px;background:var(--white);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink2);font-size:18px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.entry-item{background:var(--white);border-radius:12px;padding:14px 16px;cursor:pointer;display:flex;align-items:flex-start;gap:12px;transition:transform .15s}
+.entry-item:active{transform:scale(.985)}
+.entry-sep{width:1px;background:var(--line);align-self:stretch;min-height:28px}
+.entry-body{flex:1;min-width:0}
+.entry-title{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:2px}
+.entry-preview{font-size:12px;color:var(--ink3);line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.entry-time{font-size:11px;color:var(--ink3);flex-shrink:0;margin-top:2px}
+.spacer{height:48px}
+
+/* HOME */
+#screen-home{background:var(--bg)}
+.home-topbar{display:flex;align-items:flex-end;justify-content:space-between;padding:52px 22px 20px}
+.greeting{font-size:11px;font-weight:400;color:var(--ink3);letter-spacing:.09em;text-transform:uppercase;margin-bottom:4px}
+.date-heading{font-family:'Lora',serif;font-size:28px;font-weight:400;line-height:1.15;color:var(--ink)}
+.home-topbar-right{display:flex;gap:8px;align-items:center;padding-bottom:4px}
+.home-week-dots{display:flex;gap:5px;margin-top:10px;align-items:center}
+.hw-dot{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.hw-dot.has-entry{background:var(--accent)}
+.hw-dot.today{outline:2px solid var(--accent);outline-offset:2px}
+.home-divider{height:1px;background:var(--line);margin:0 22px 24px}
+
+.day-slide-wrapper{position:relative;overflow:hidden;flex:1}
+.day-slide{display:flex;flex-direction:column;gap:8px;padding:0 20px;transition:transform .3s cubic-bezier(.22,1,.36,1),opacity .25s}
+.day-slide.out-left{transform:translateX(-60px);opacity:0}
+.day-slide.out-right{transform:translateX(60px);opacity:0}
+.day-slide.in-left{transform:translateX(60px);opacity:0}
+.day-slide.in-right{transform:translateX(-60px);opacity:0}
+
+.q-item{background:var(--white);border-radius:var(--radius);padding:17px 18px;cursor:pointer;display:flex;align-items:flex-start;gap:13px;transition:transform .15s}
+.q-item:active{transform:scale(.985)}
+.q-item.done{opacity:.45}
+.q-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:5px}
+.q-item.done .q-dot{background:var(--line)}
+.q-body{flex:1}
+.q-freq{font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.q-item.done .q-freq{color:var(--ink3)}
+.q-text{font-family:'Lora',serif;font-size:16px;line-height:1.5;color:var(--ink)}
+.q-check{width:22px;height:22px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--ink3);flex-shrink:0;margin-top:2px}
+
+.day-entries-label{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);padding:20px 0 10px}
+.empty-state{text-align:center;padding:32px 24px;color:var(--ink3);font-size:14px;font-family:'Lora',serif;font-style:italic;line-height:1.6}
+.swipe-hint{text-align:center;font-size:11px;color:var(--ink3);padding:20px 0 8px}
+
+.sticky-spacer{height:88px}
+.sticky-free-write{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;padding:12px 20px 28px;background:linear-gradient(to bottom,transparent,var(--bg) 28%);z-index:50}
+.free-write-btn{background:var(--ink);color:var(--white);border:none;border-radius:14px;padding:16px 22px;width:100%;font-family:'DM Sans',sans-serif;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:opacity .2s;box-shadow:0 4px 20px rgba(26,23,20,.18)}
+.free-write-btn:active{opacity:.85}
+
+/* WRITE */
+#screen-write{background:var(--white)}
+.write-topbar{display:flex;align-items:center;justify-content:space-between;padding:52px 20px 14px;border-bottom:1px solid var(--line)}
+.back-btn{width:38px;height:38px;background:var(--bg);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink)}
+.back-btn svg{width:18px;height:18px}
+.write-date{font-size:13px;color:var(--ink3)}
+.save-btn{background:var(--accent);color:white;border:none;border-radius:20px;padding:8px 18px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:opacity .2s}
+.save-btn:active{opacity:.8}
+.write-q-block{padding:22px 24px 0}
+.wq-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:7px}
+.wq-text{font-family:'Lora',serif;font-size:18px;line-height:1.5;color:var(--ink)}
+.write-sep{height:1px;background:var(--line);margin:18px 24px 0}
+.write-area{flex:1;padding:18px 24px 0;display:flex;flex-direction:column}
+textarea{flex:1;background:transparent;border:none;outline:none;font-family:'Lora',serif;font-size:17px;line-height:1.85;color:var(--ink);resize:none;min-height:240px;caret-color:var(--accent)}
+textarea::placeholder{color:var(--ink3);font-style:italic}
+.write-footer{display:flex;justify-content:flex-end;padding:12px 24px 40px;border-top:1px solid var(--line)}
+.word-count{font-size:12px;color:var(--ink3)}
+
+/* ENTRY DETAIL */
+#screen-entry{background:var(--white)}
+.entry-detail-topbar{display:flex;align-items:center;justify-content:space-between;padding:52px 20px 14px;border-bottom:1px solid var(--line)}
+.entry-detail-meta{font-size:13px;color:var(--ink3)}
+.entry-delete-btn{font-size:13px;color:#C44A2A;background:none;border:none;cursor:pointer;padding:8px}
+.entry-detail-content{flex:1;padding:22px 24px;font-family:'Lora',serif;font-size:17px;line-height:1.85;color:var(--ink);white-space:pre-wrap;overflow-y:auto}
+.entry-detail-question{padding:22px 24px 0}
+.entry-detail-q-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:6px}
+.entry-detail-q-text{font-family:'Lora',serif;font-size:16px;color:var(--ink);line-height:1.5;margin-bottom:0}
+.entry-detail-divider{height:1px;background:var(--line);margin:16px 24px 0}
+
+/* JOURNEY */
+#screen-journey{background:var(--bg)}
+.journey-topbar{display:flex;align-items:center;justify-content:space-between;padding:52px 20px 24px}
+.journey-topbar h1{font-family:'Lora',serif;font-size:26px;font-weight:400}
+.journey-total{padding:0 20px 20px}
+.journey-total-card{background:var(--white);border-radius:var(--radius);padding:18px 20px;display:flex;align-items:baseline;gap:8px}
+.jt-number{font-family:'Lora',serif;font-size:36px;font-weight:400;color:var(--ink);line-height:1}
+.jt-label{font-size:13px;color:var(--ink3)}
+.journey-week{padding:0 20px 20px}
+.journey-week-card{background:var(--white);border-radius:var(--radius);padding:16px 20px}
+.jw-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.09em;color:var(--ink3);margin-bottom:12px}
+.jw-dots{display:flex;gap:0;justify-content:space-between}
+.jw-day{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
+.jw-dot{width:10px;height:10px;border-radius:50%;background:var(--bg2)}
+.jw-dot.has-entry{background:var(--accent)}
+.jw-dot.today{outline:2px solid var(--accent);outline-offset:2px}
+.jw-name{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3)}
+.jw-name.today{color:var(--accent);font-weight:500}
+.journey-section-label{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);padding:4px 24px 12px}
+.journey-cal{margin:0 20px 8px;background:var(--white);border-radius:var(--radius);padding:20px}
+.j-month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.j-month-btn{width:30px;height:30px;background:var(--bg);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--ink2)}
+.j-month-label{font-size:14px;font-weight:500;color:var(--ink)}
+.j-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+.j-cal-dow{font-size:9px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;padding:3px 0 8px}
+.j-cal-day{width:36px;height:36px;display:flex;align-items:center;justify-content:center;margin:0 auto;border-radius:50%;font-size:13px;color:var(--ink);cursor:pointer;transition:background .15s;position:relative}
+.j-cal-day:hover{background:var(--bg2)}
+.j-cal-day.empty,.j-cal-day.future{pointer-events:none}
+.j-cal-day.future{color:var(--ink3)}
+.j-cal-day.today{color:var(--accent);font-weight:500}
+.j-cal-day.selected{background:var(--ink);color:var(--white) !important}
+.j-cal-day.has-entry::after{content:'';display:block;width:4px;height:4px;background:var(--accent);border-radius:50%;position:absolute;bottom:3px;left:50%;transform:translateX(-50%)}
+.j-cal-day.selected::after{background:var(--white)}
+.journey-day-entries{margin:0 20px;display:flex;flex-direction:column;gap:8px}
+.journey-day-header{font-family:'Lora',serif;font-size:16px;color:var(--ink);padding:16px 0 8px;font-weight:400}
+.journey-day-empty{font-size:13px;color:var(--ink3);font-style:italic;font-family:'Lora',serif;padding:8px 0 16px}
+
+/* SETTINGS */
+#screen-settings{background:var(--bg)}
+.settings-topbar{display:flex;align-items:center;justify-content:space-between;padding:52px 20px 20px}
+.settings-topbar h1{font-family:'Lora',serif;font-size:26px;font-weight:400}
+.privacy-card{margin:0 20px 24px;background:var(--green);border-radius:var(--radius);padding:16px 18px;display:flex;gap:12px;align-items:flex-start}
+.privacy-card h4{font-size:13px;font-weight:500;color:var(--green-ink);margin-bottom:3px}
+.privacy-card p{font-size:12px;color:#4A7A4A;line-height:1.5}
+.s-section{margin-bottom:24px}
+.s-label{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);padding:0 24px 10px}
+.s-group{background:var(--white);margin:0 20px;border-radius:var(--radius);overflow:hidden}
+.s-row{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid var(--line);cursor:pointer}
+.s-row:last-child{border-bottom:none}
+.s-row-left{display:flex;align-items:center;gap:12px}
+.s-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.s-row-label{font-size:14px;color:var(--ink)}
+.s-row-value{font-size:13px;color:var(--ink3)}
+.s-chevron{color:var(--line);font-size:16px;margin-left:6px}
+.q-settings-list{margin:0 20px;display:flex;flex-direction:column;gap:7px}
+.q-settings-item{background:var(--white);border-radius:12px;padding:13px 15px;display:flex;align-items:center;gap:10px}
+.qs-freq{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);background:var(--accent-light);padding:3px 7px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.qs-text{flex:1;font-size:13px;color:var(--ink);line-height:1.4}
+.qs-drag{color:var(--line);font-size:14px;cursor:grab}
+.add-q-btn{margin:8px 20px 0;background:transparent;border:1.5px dashed var(--line);border-radius:12px;padding:13px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink3);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;width:calc(100% - 40px);transition:border-color .2s,color .2s}
+.add-q-btn:hover{border-color:var(--accent);color:var(--accent)}
+.qs-notif{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--ink3);background:var(--bg2);border-radius:20px;padding:3px 8px;white-space:nowrap;flex-shrink:0;cursor:pointer;transition:background .15s}
+.qs-notif:hover{background:var(--accent-light);color:var(--accent)}
+.qs-notif svg{width:11px;height:11px}
+.qs-notif-add{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--ink3);background:transparent;border:1px dashed var(--line);border-radius:20px;padding:3px 8px;white-space:nowrap;flex-shrink:0;cursor:pointer;transition:border-color .15s,color .15s}
+.qs-notif-add:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ADD QUESTION SHEET */
+.sheet-overlay{display:none;position:fixed;inset:0;background:rgba(26,23,20,.35);z-index:100;backdrop-filter:blur(2px)}
+.sheet-overlay.open{display:block}
+.sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--white);border-radius:22px 22px 0 0;padding:12px 24px 40px;z-index:101;animation:slideSheet .28s cubic-bezier(.22,1,.36,1)}
+@keyframes slideSheet{from{transform:translateX(-50%) translateY(100%)}to{transform:translateX(-50%) translateY(0)}}
+.sheet-handle{width:36px;height:4px;background:var(--line);border-radius:2px;margin:0 auto 20px}
+.sheet-title{font-family:'Lora',serif;font-size:18px;font-weight:400;color:var(--ink);margin-bottom:20px}
+.sheet-input{width:100%;background:var(--bg);border:none;border-radius:12px;padding:14px 16px;font-family:'Lora',serif;font-size:16px;color:var(--ink);outline:none;margin-bottom:14px}
+.sheet-input::placeholder{color:var(--ink3);font-style:italic}
+.sheet-freq-row{display:flex;gap:8px;margin-bottom:20px}
+.freq-btn{flex:1;padding:10px;background:var(--bg);border:1.5px solid transparent;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink2);cursor:pointer;transition:all .15s}
+.freq-btn.active{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-weight:500}
+.sheet-save-btn{width:100%;background:var(--ink);color:var(--white);border:none;border-radius:14px;padding:16px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:opacity .2s}
+.sheet-save-btn:active{opacity:.85}
+
+/* NOTIFICATION SHEET */
+.notif-overlay{display:none;position:fixed;inset:0;background:rgba(26,23,20,.35);z-index:200;backdrop-filter:blur(2px)}
+.notif-overlay.open{display:block}
+.notif-sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--white);border-radius:22px 22px 0 0;padding:12px 24px 40px;z-index:201;animation:slideSheet .28s cubic-bezier(.22,1,.36,1)}
+.notif-sheet-title{font-family:'Lora',serif;font-size:17px;font-weight:400;margin-bottom:4px}
+.notif-sheet-sub{font-size:12px;color:var(--ink3);margin-bottom:24px;line-height:1.5}
+.time-picker-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:24px}
+.time-picker-row select{font-family:'Lora',serif;font-size:32px;color:var(--ink);background:var(--bg);border:none;border-radius:12px;padding:12px 10px;text-align:center;cursor:pointer;appearance:none;-webkit-appearance:none;outline:none;width:90px}
+.time-colon{font-family:'Lora',serif;font-size:32px;color:var(--ink2)}
+.notif-save-btn{width:100%;background:var(--ink);color:var(--white);border:none;border-radius:14px;padding:16px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;margin-bottom:10px;transition:opacity .2s}
+.notif-save-btn:active{opacity:.85}
+.notif-remove-btn{width:100%;background:transparent;color:var(--ink3);border:none;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;padding:10px}
+
+/* CONFIRM DIALOG */
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(26,23,20,.4);z-index:300;backdrop-filter:blur(2px);align-items:flex-end;justify-content:center}
+.confirm-overlay.open{display:flex}
+.confirm-box{background:var(--white);border-radius:22px 22px 0 0;padding:24px 24px 40px;width:100%;max-width:430px;animation:slideSheet .25s cubic-bezier(.22,1,.36,1)}
+.confirm-title{font-family:'Lora',serif;font-size:17px;margin-bottom:8px}
+.confirm-msg{font-size:13px;color:var(--ink3);margin-bottom:24px;line-height:1.5}
+.confirm-btns{display:flex;flex-direction:column;gap:8px}
+.confirm-del-btn{width:100%;background:#C44A2A;color:white;border:none;border-radius:14px;padding:15px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer}
+.confirm-cancel-btn{width:100%;background:transparent;color:var(--ink3);border:none;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;padding:10px}
+
+/* TOAST */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--ink);color:var(--white);padding:11px 20px;border-radius:30px;font-size:13px;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;z-index:400}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="home-topbar">
+    <div>
+      <div class="greeting" id="greeting-text"></div>
+      <div class="date-heading" id="date-heading"></div>
+      <div class="home-week-dots" id="home-week-dots"></div>
+    </div>
+    <div class="home-topbar-right">
+      <button class="icon-btn" onclick="showScreen('journey')" title="Journey">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </button>
+      <button class="icon-btn" onclick="showScreen('settings')" title="Instellingen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="home-divider"></div>
+  <div class="day-slide-wrapper" id="day-wrapper">
+    <div class="day-slide" id="day-slide"></div>
+  </div>
+  <div class="sticky-spacer"></div>
+  <div class="sticky-free-write">
+    <button class="free-write-btn" onclick="openWrite(null,null)">
+      Vrij schrijven <span style="font-size:18px;opacity:.6">✦</span>
+    </button>
+  </div>
+</div>
+
+<!-- WRITE -->
+<div class="screen" id="screen-write">
+  <div class="write-topbar">
+    <button class="back-btn" onclick="showScreen('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <span class="write-date" id="write-date-label"></span>
+    <button class="save-btn" onclick="saveEntry()">Opslaan</button>
+  </div>
+  <div id="write-question-block"></div>
+  <div class="write-area">
+    <textarea id="write-textarea" placeholder="Begin te schrijven..."></textarea>
+  </div>
+  <div class="write-footer">
+    <span class="word-count" id="word-count">0 woorden</span>
+  </div>
+</div>
+
+<!-- ENTRY DETAIL -->
+<div class="screen" id="screen-entry">
+  <div class="entry-detail-topbar">
+    <button class="back-btn" onclick="closeEntryDetail()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <span class="entry-detail-meta" id="entry-detail-meta"></span>
+    <button class="entry-delete-btn" onclick="confirmDeleteEntry()">Verwijder</button>
+  </div>
+  <div id="entry-detail-question-block"></div>
+  <div class="entry-detail-content" id="entry-detail-content"></div>
+</div>
+
+<!-- JOURNEY -->
+<div class="screen" id="screen-journey">
+  <div class="journey-topbar">
+    <h1>Journey</h1>
+    <button class="close-btn" onclick="showScreen('home')">✕</button>
+  </div>
+  <div class="journey-total">
+    <div class="journey-total-card">
+      <div class="jt-number" id="jt-number">0</div>
+      <div class="jt-label" id="jt-label">entries geschreven</div>
+    </div>
+  </div>
+  <div class="journey-week">
+    <div class="journey-week-card">
+      <div class="jw-label">Deze week</div>
+      <div class="jw-dots" id="jw-dots"></div>
+    </div>
+  </div>
+  <div class="journey-section-label">Blader door je entries</div>
+  <div class="journey-cal">
+    <div class="j-month-nav">
+      <button class="j-month-btn" onclick="changeJourneyMonth(-1)">‹</button>
+      <span class="j-month-label" id="j-month-label"></span>
+      <button class="j-month-btn" onclick="changeJourneyMonth(1)">›</button>
+    </div>
+    <div class="j-cal-grid" id="j-cal-grid"></div>
+  </div>
+  <div class="journey-day-entries" id="journey-day-entries"></div>
+  <div class="spacer"></div>
+</div>
+
+<!-- SETTINGS -->
+<div class="screen" id="screen-settings">
+  <div class="settings-topbar">
+    <h1>Instellingen</h1>
+    <button class="close-btn" onclick="showScreen('home')">✕</button>
+  </div>
+  <div class="privacy-card">
+    <div style="font-size:19px;margin-top:1px">🔒</div>
+    <div><h4>Niemand leest mee</h4><p>Jouw entries worden alleen lokaal opgeslagen in deze browser. Nooit gedeeld.</p></div>
+  </div>
+  <div class="s-section">
+    <div class="s-label">Mijn vragen</div>
+    <div class="q-settings-list" id="q-settings-list"></div>
+    <button class="add-q-btn" onclick="openAddQuestion()">+ Nieuwe vraag toevoegen</button>
+  </div>
+  <div class="s-section">
+    <div class="s-label">Data</div>
+    <div class="s-group">
+      <div class="s-row" onclick="exportData()"><div class="s-row-left"><div class="s-icon" style="background:#F0E4D4">📤</div><span class="s-row-label">Exporteer mijn data</span></div><span class="s-chevron">›</span></div>
+      <div class="s-row" onclick="confirmClearData()"><div class="s-row-left"><div class="s-icon" style="background:#F4EEEE">🗑</div><span class="s-row-label">Verwijder alle data</span></div><span class="s-chevron">›</span></div>
+    </div>
+  </div>
+  <div class="spacer"></div>
+</div>
+
+<!-- ADD QUESTION SHEET -->
+<div class="sheet-overlay" id="add-q-overlay" onclick="closeAddQuestion()"></div>
+<div class="sheet" id="add-q-sheet" style="display:none">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">Nieuwe vraag</div>
+  <input class="sheet-input" id="new-q-text" placeholder="Schrijf je vraag hier..." maxlength="120">
+  <div class="sheet-freq-row">
+    <button class="freq-btn active" id="freq-dag" onclick="setFreq('Dagelijks')">Dagelijks</button>
+    <button class="freq-btn" id="freq-week" onclick="setFreq('Wekelijks')">Wekelijks</button>
+    <button class="freq-btn" id="freq-maand" onclick="setFreq('Maandelijks')">Maandelijks</button>
+  </div>
+  <button class="sheet-save-btn" onclick="saveNewQuestion()">Vraag toevoegen</button>
+</div>
+
+<!-- NOTIFICATION SHEET -->
+<div class="notif-overlay" id="notif-overlay" onclick="closeNotifSheet()"></div>
+<div class="notif-sheet" id="notif-sheet" style="display:none">
+  <div class="sheet-handle"></div>
+  <div class="notif-sheet-title">Melding instellen</div>
+  <div class="notif-sheet-sub" id="notif-sheet-sub"></div>
+  <div class="time-picker-row">
+    <select id="notif-hour"></select>
+    <span class="time-colon">:</span>
+    <select id="notif-min"></select>
+  </div>
+  <button class="notif-save-btn" onclick="saveNotif()">Melding opslaan</button>
+  <button class="notif-remove-btn" id="notif-remove-btn" onclick="removeNotif()">Melding verwijderen</button>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-title" id="confirm-title"></div>
+    <div class="confirm-msg" id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button class="confirm-del-btn" id="confirm-action-btn"></button>
+      <button class="confirm-cancel-btn" onclick="closeConfirm()">Annuleren</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONSTANTS ────────────────────────────────────────
+const NL_DAYS = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'];
+const NL_DAYS_SHORT = ['Zo','Ma','Di','Wo','Do','Vr','Za'];
+const NL_MONTHS = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+
+const DEFAULT_QUESTIONS = [
+  { id: q_id(), text:'Waar ben ik vandaag dankbaar voor?',     freq:'Dagelijks',   notif:null },
+  { id: q_id(), text:'Wat wil ik morgen anders doen?',          freq:'Dagelijks',   notif:null },
+  { id: q_id(), text:'Wat heeft me deze week energie gegeven?', freq:'Wekelijks',   notif:null },
+  { id: q_id(), text:'Wat heeft energie gekost deze week?',     freq:'Wekelijks',   notif:null },
+  { id: q_id(), text:'Ben ik dichter bij mijn doelen gekomen?', freq:'Maandelijks', notif:null },
+];
+
+function q_id() { return 'q_' + Math.random().toString(36).slice(2,9); }
+function e_id() { return 'e_' + Date.now() + '_' + Math.random().toString(36).slice(2,6); }
+
+// ── STORAGE ───────────────────────────────────────────
+const STORE = {
+  get(k, def) { try { const v = localStorage.getItem(k); return v !== null ? JSON.parse(v) : def; } catch(e){ return def; } },
+  set(k, v)   { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} },
+};
+
+function loadQuestions() {
+  return STORE.get('innerlijk_questions', null) || (() => { const q = DEFAULT_QUESTIONS; STORE.set('innerlijk_questions', q); return q; })();
+}
+function saveQuestions(q) { STORE.set('innerlijk_questions', q); }
+
+function loadEntries() { return STORE.get('innerlijk_entries', {}); }
+function saveEntries(e) { STORE.set('innerlijk_entries', e); }
+
+function loadMeta() {
+  let m = STORE.get('innerlijk_meta', null);
+  if (!m) { m = { startDate: dateKey(new Date()) }; STORE.set('innerlijk_meta', m); }
+  return m;
+}
+
+// ── STATE ─────────────────────────────────────────────
+let QUESTIONS = loadQuestions();
+let ENTRIES   = loadEntries();
+let META      = loadMeta();
+
+const TODAY = new Date();
+let currentDate     = new Date(TODAY);
+let journeyMonth    = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
+let selectedJDay    = null;
+let activeNotifIdx  = null;
+let newQFreq        = 'Dagelijks';
+let entryDetailFrom = 'home'; // 'home' or 'journey'
+let pendingDeleteId = null;
+let pendingDeleteKey= null;
+let confirmCallback = null;
+
+// ── HELPERS ───────────────────────────────────────────
+function dateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function isToday(d) { return dateKey(d) === dateKey(TODAY); }
+function fmt_time(d) { return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
+function greeting() {
+  const h = TODAY.getHours();
+  return h < 12 ? 'Goedemorgen' : h < 18 ? 'Goedemiddag' : 'Goedenavond';
+}
+function entryDates() { return new Set(Object.keys(ENTRIES).filter(k => ENTRIES[k] && ENTRIES[k].length > 0)); }
+function totalEntries() { return Object.values(ENTRIES).reduce((s,a) => s + a.length, 0); }
+
+// ── SCREEN NAV ────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  window.scrollTo(0, 0);
+  if (name === 'home')     { currentDate = new Date(TODAY); renderHome(); }
+  if (name === 'journey')  renderJourney();
+  if (name === 'settings') renderQSettings();
+}
+
+// ── HOME ──────────────────────────────────────────────
+function renderHome() {
+  document.getElementById('greeting-text').textContent = isToday(currentDate) ? greeting() : '';
+  const dn = NL_DAYS[currentDate.getDay()];
+  const ds = `${currentDate.getDate()} ${NL_MONTHS[currentDate.getMonth()]}`;
+  document.getElementById('date-heading').innerHTML = isToday(currentDate) ? `${dn},<br>${ds}` : `${dn}<br>${ds}`;
+  renderWeekDotsHome();
+  renderDaySlide();
+}
+
+function renderWeekDotsHome() {
+  const dow = (TODAY.getDay() + 6) % 7;
+  const mon = new Date(TODAY); mon.setDate(TODAY.getDate() - dow);
+  const ed = entryDates();
+  let html = '';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(mon); d.setDate(mon.getDate() + i);
+    const dk = dateKey(d), has = ed.has(dk), isT = isToday(d), fut = d > TODAY;
+    html += `<div class="hw-dot${has?' has-entry':''}${isT?' today':''}" style="${fut?'opacity:.25':''}"></div>`;
+  }
+  document.getElementById('home-week-dots').innerHTML = html;
+}
+
+function renderDaySlide() {
+  const key = dateKey(currentDate);
+  const dayEntries = ENTRIES[key] || [];
+  const isT = isToday(currentDate);
+  let html = '';
+
+  if (isT) {
+    // Which questions are answered today?
+    const answeredQIds = new Set(dayEntries.filter(e => e.qid).map(e => e.qid));
+    QUESTIONS.forEach(q => {
+      const done = answeredQIds.has(q.id);
+      html += `<div class="q-item${done?' done':''}" ${done?'':` onclick="openWrite('${q.text.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','${q.freq}','${q.id}')"`}>
+        <div class="q-dot"></div>
+        <div class="q-body"><div class="q-freq">${q.freq}</div><div class="q-text">${q.text}</div></div>
+        ${done ? '<div class="q-check">✓</div>' : ''}
+      </div>`;
+    });
+  }
+
+  if (dayEntries.length > 0) {
+    if (isT) html += `<div class="day-entries-label">Geschreven vandaag</div>`;
+    dayEntries.forEach(e => {
+      html += `<div class="entry-item" onclick="openEntryDetail('${key}','${e.id}','home')">
+        <div class="entry-body"><div class="entry-title">${e.title}</div><div class="entry-preview">${esc(e.text)}</div></div>
+        <div class="entry-time">${e.time}</div>
+      </div>`;
+    });
+  } else if (!isT) {
+    html += `<div class="empty-state">Geen entries op deze dag.</div>`;
+  }
+  if (!isT) html += `<div class="swipe-hint">← swipe terug naar vandaag</div>`;
+  document.getElementById('day-slide').innerHTML = html;
+}
+
+function esc(t) { return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── SWIPE ─────────────────────────────────────────────
+let tx=0,ty=0;
+document.getElementById('day-wrapper').addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+document.getElementById('day-wrapper').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)<40||Math.abs(dy)>Math.abs(dx)*.8)return;
+  navigateDay(dx<0?1:-1);
+},{passive:true});
+
+function navigateDay(delta) {
+  const slide = document.getElementById('day-slide');
+  const outC = delta>0?'out-left':'out-right', inC = delta>0?'in-right':'in-left';
+  slide.classList.add(outC);
+  setTimeout(()=>{
+    const next=new Date(currentDate); next.setDate(next.getDate()+delta);
+    if(next>TODAY){slide.classList.remove(outC);return;}
+    currentDate=next; slide.classList.remove(outC); slide.classList.add(inC);
+    renderHome();
+    requestAnimationFrame(()=>requestAnimationFrame(()=>slide.classList.remove(inC)));
+  },220);
+}
+
+// ── WRITE ─────────────────────────────────────────────
+let writeQid = null;
+
+function openWrite(question, freq, qid) {
+  writeQid = qid || null;
+  const dl = `${currentDate.getDate()} ${NL_MONTHS[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+  document.getElementById('write-date-label').textContent = dl;
+  const block = document.getElementById('write-question-block');
+  block.innerHTML = question
+    ? `<div class="write-q-block"><div class="wq-label">${freq}</div><div class="wq-text">${esc(question)}</div><div class="write-sep"></div></div>`
+    : `<div class="write-q-block"><div class="wq-label" style="color:var(--ink3)">Vrij schrijven</div><div class="write-sep"></div></div>`;
+  document.getElementById('write-textarea').value = '';
+  document.getElementById('word-count').textContent = '0 woorden';
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-write').classList.add('active');
+  setTimeout(()=>document.getElementById('write-textarea').focus(),320);
+}
+
+document.getElementById('write-textarea').addEventListener('input',function(){
+  const w=this.value.trim()?this.value.trim().split(/\s+/).length:0;
+  document.getElementById('word-count').textContent=w+(w===1?' woord':' woorden');
+});
+
+function saveEntry() {
+  const text = document.getElementById('write-textarea').value.trim();
+  if (!text) { showToast('Schrijf eerst iets'); return; }
+
+  const key = dateKey(currentDate);
+  if (!ENTRIES[key]) ENTRIES[key] = [];
+
+  // derive title
+  const qBlock = document.getElementById('write-question-block');
+  const qLabel = qBlock.querySelector('.wq-label');
+  const qText  = qBlock.querySelector('.wq-text');
+  const title  = qText ? qText.textContent.slice(0,40) : 'Vrij schrijven';
+
+  const entry = {
+    id:    e_id(),
+    qid:   writeQid,
+    title: title,
+    text:  text,
+    time:  fmt_time(new Date()),
+    date:  key,
+  };
+  ENTRIES[key].push(entry);
+  saveEntries(ENTRIES);
+  showToast('Opgeslagen ✓');
+  setTimeout(()=>showScreen('home'), 800);
+}
+
+// ── ENTRY DETAIL ──────────────────────────────────────
+function openEntryDetail(dateK, entryId, from) {
+  entryDetailFrom = from;
+  pendingDeleteId  = entryId;
+  pendingDeleteKey = dateK;
+  const e = (ENTRIES[dateK]||[]).find(e=>e.id===entryId);
+  if (!e) return;
+  const d = new Date(dateK);
+  document.getElementById('entry-detail-meta').textContent = `${NL_DAYS[d.getDay()]} ${d.getDate()} ${NL_MONTHS[d.getMonth()]} · ${e.time}`;
+
+  const qblock = document.getElementById('entry-detail-question-block');
+  if (e.qid) {
+    const q = QUESTIONS.find(q=>q.id===e.qid);
+    qblock.innerHTML = q ? `<div class="entry-detail-question"><div class="entry-detail-q-label">${q.freq}</div><div class="entry-detail-q-text">${esc(q.text)}</div><div class="entry-detail-divider"></div></div>` : '';
+  } else {
+    qblock.innerHTML = `<div class="entry-detail-question"><div class="entry-detail-q-label" style="color:var(--ink3)">Vrij schrijven</div><div class="entry-detail-divider"></div></div>`;
+  }
+
+  document.getElementById('entry-detail-content').textContent = e.text;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-entry').classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function closeEntryDetail() {
+  if (entryDetailFrom === 'journey') { showScreen('journey'); }
+  else { showScreen('home'); }
+}
+
+function confirmDeleteEntry() {
+  openConfirm(
+    'Entry verwijderen',
+    'Dit kan niet ongedaan worden gemaakt.',
+    'Verwijderen',
+    () => {
+      ENTRIES[pendingDeleteKey] = (ENTRIES[pendingDeleteKey]||[]).filter(e=>e.id!==pendingDeleteId);
+      if (ENTRIES[pendingDeleteKey].length === 0) delete ENTRIES[pendingDeleteKey];
+      saveEntries(ENTRIES);
+      showToast('Verwijderd');
+      closeEntryDetail();
+    }
+  );
+}
+
+// ── JOURNEY ───────────────────────────────────────────
+function renderJourney() {
+  // Total
+  const total = totalEntries();
+  document.getElementById('jt-number').textContent = total;
+  const meta = loadMeta();
+  const sd = new Date(meta.startDate);
+  document.getElementById('jt-label').textContent = `entries geschreven sinds ${NL_MONTHS[sd.getMonth()]} ${sd.getFullYear()}`;
+
+  renderWeekDotsJourney();
+  renderJourneyCalendar();
+  if (selectedJDay) renderJourneyDayEntries(selectedJDay);
+  else document.getElementById('journey-day-entries').innerHTML='';
+}
+
+function renderWeekDotsJourney() {
+  const dow=(TODAY.getDay()+6)%7;
+  const mon=new Date(TODAY); mon.setDate(TODAY.getDate()-dow);
+  const ed=entryDates();
+  let html='';
+  for(let i=0;i<7;i++){
+    const d=new Date(mon);d.setDate(mon.getDate()+i);
+    const dk=dateKey(d),has=ed.has(dk),isT=isToday(d),fut=d>TODAY;
+    html+=`<div class="jw-day"><div class="jw-dot${has?' has-entry':''}${isT?' today':''}" style="${fut?'opacity:.25':''}"></div><div class="jw-name${isT?' today':''}">${NL_DAYS_SHORT[d.getDay()]}</div></div>`;
+  }
+  document.getElementById('jw-dots').innerHTML=html;
+}
+
+function renderJourneyCalendar() {
+  const y=journeyMonth.getFullYear(), m=journeyMonth.getMonth();
+  document.getElementById('j-month-label').textContent=`${NL_MONTHS[m]} ${y}`;
+  const firstDow=(new Date(y,m,1).getDay()+6)%7;
+  const dim=new Date(y,m+1,0).getDate();
+  const todayKey=dateKey(TODAY);
+  const ed=entryDates();
+  let html=NL_DAYS_SHORT.map(d=>`<div class="j-cal-dow">${d}</div>`).join('');
+  for(let i=0;i<firstDow;i++) html+=`<div class="j-cal-day empty"></div>`;
+  for(let d=1;d<=dim;d++){
+    const dd=new Date(y,m,d), dk=dateKey(dd);
+    const fut=dd>TODAY, isT=dk===todayKey;
+    const isSel=selectedJDay&&dk===dateKey(selectedJDay);
+    const hasE=ed.has(dk);
+    const cls=['j-cal-day',fut?'future':'',isT&&!isSel?'today':'',isSel?'selected':'',hasE&&!isSel?'has-entry':''].filter(Boolean).join(' ');
+    html+=`<div class="${cls}" ${fut?'':` onclick="pickJourneyDay(${y},${m},${d})"`}>${d}</div>`;
+  }
+  document.getElementById('j-cal-grid').innerHTML=html;
+}
+
+function changeJourneyMonth(delta) {
+  journeyMonth=new Date(journeyMonth.getFullYear(),journeyMonth.getMonth()+delta,1);
+  renderJourneyCalendar();
+}
+
+function pickJourneyDay(y,m,d) {
+  selectedJDay=new Date(y,m,d);
+  renderJourneyCalendar();
+  renderJourneyDayEntries(selectedJDay);
+}
+
+function renderJourneyDayEntries(d) {
+  const container=document.getElementById('journey-day-entries');
+  const dk=dateKey(d), entries=ENTRIES[dk]||[];
+  const label=`${NL_DAYS[d.getDay()]} ${d.getDate()} ${NL_MONTHS[d.getMonth()]}`;
+  if(entries.length===0){
+    container.innerHTML=`<div class="journey-day-header">${label}</div><div class="journey-day-empty">Geen entries op deze dag.</div>`;
+    return;
+  }
+  let html=`<div class="journey-day-header">${label}</div>`;
+  entries.forEach(e=>{
+    html+=`<div class="entry-item" onclick="openEntryDetail('${dk}','${e.id}','journey')">
+      <div class="entry-body"><div class="entry-title">${esc(e.title)}</div><div class="entry-preview">${esc(e.text)}</div></div>
+      <div class="entry-time">${e.time}</div>
+    </div>`;
+  });
+  container.innerHTML=html;
+}
+
+// ── SETTINGS ──────────────────────────────────────────
+function renderQSettings() {
+  const list=document.getElementById('q-settings-list');
+  if(!list)return;
+  list.innerHTML=QUESTIONS.map((q,i)=>{
+    const notifHTML=q.notif
+      ? `<span class="qs-notif" onclick="openNotifSheet(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>${q.notif}</span>`
+      : `<span class="qs-notif-add" onclick="openNotifSheet(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>+</span>`;
+    return `<div class="q-settings-item"><span class="qs-freq">${q.freq}</span><span class="qs-text">${esc(q.text)}</span>${notifHTML}<span class="qs-drag" onclick="removeQuestion(${i})" title="Verwijder vraag" style="cursor:pointer;font-size:18px;color:var(--ink3)">×</span></div>`;
+  }).join('');
+}
+
+function removeQuestion(idx) {
+  openConfirm('Vraag verwijderen','Eerder opgeslagen entries die aan deze vraag zijn gekoppeld blijven bewaard.','Verwijderen',()=>{
+    QUESTIONS.splice(idx,1);
+    saveQuestions(QUESTIONS);
+    renderQSettings();
+    showToast('Vraag verwijderd');
+  });
+}
+
+// ── ADD QUESTION ──────────────────────────────────────
+function openAddQuestion() {
+  newQFreq='Dagelijks';
+  document.getElementById('new-q-text').value='';
+  ['dag','week','maand'].forEach(f=>document.getElementById('freq-'+f).classList.remove('active'));
+  document.getElementById('freq-dag').classList.add('active');
+  document.getElementById('add-q-overlay').classList.add('open');
+  document.getElementById('add-q-sheet').style.display='block';
+  setTimeout(()=>document.getElementById('new-q-text').focus(),300);
+}
+function closeAddQuestion() {
+  document.getElementById('add-q-overlay').classList.remove('open');
+  document.getElementById('add-q-sheet').style.display='none';
+}
+function setFreq(f) {
+  newQFreq=f;
+  const map={'Dagelijks':'dag','Wekelijks':'week','Maandelijks':'maand'};
+  ['dag','week','maand'].forEach(k=>document.getElementById('freq-'+k).classList.remove('active'));
+  document.getElementById('freq-'+map[f]).classList.add('active');
+}
+function saveNewQuestion() {
+  const text=document.getElementById('new-q-text').value.trim();
+  if(!text){showToast('Vul een vraag in');return;}
+  QUESTIONS.push({id:q_id(),text,freq:newQFreq,notif:null});
+  saveQuestions(QUESTIONS);
+  closeAddQuestion();
+  renderQSettings();
+  showToast('Vraag toegevoegd ✓');
+}
+
+// ── NOTIFICATIONS ─────────────────────────────────────
+function openNotifSheet(idx) {
+  activeNotifIdx=idx;
+  const q=QUESTIONS[idx];
+  const hs=document.getElementById('notif-hour');
+  hs.innerHTML=Array.from({length:24},(_,i)=>`<option value="${i}" ${q.notif&&parseInt(q.notif)==i?'selected':''}>${String(i).padStart(2,'0')}</option>`).join('');
+  const ms=document.getElementById('notif-min');
+  const cm=q.notif?q.notif.split(':')[1]:'00';
+  ms.innerHTML=['00','15','30','45'].map(m=>`<option value="${m}" ${m===cm?'selected':''}>${m}</option>`).join('');
+  document.getElementById('notif-remove-btn').style.display=q.notif?'block':'none';
+  document.getElementById('notif-sheet-sub').textContent=`"${q.text.length>42?q.text.slice(0,40)+'…':q.text}"`;
+  document.getElementById('notif-overlay').classList.add('open');
+  document.getElementById('notif-sheet').style.display='block';
+}
+function closeNotifSheet() {
+  document.getElementById('notif-overlay').classList.remove('open');
+  document.getElementById('notif-sheet').style.display='none';
+}
+function saveNotif() {
+  const h=String(document.getElementById('notif-hour').value).padStart(2,'0');
+  const m=document.getElementById('notif-min').value;
+  QUESTIONS[activeNotifIdx].notif=`${h}:${m}`;
+  saveQuestions(QUESTIONS);
+  closeNotifSheet();renderQSettings();showToast('Melding opgeslagen ✓');
+}
+function removeNotif() {
+  QUESTIONS[activeNotifIdx].notif=null;
+  saveQuestions(QUESTIONS);
+  closeNotifSheet();renderQSettings();showToast('Melding verwijderd');
+}
+
+// ── EXPORT ────────────────────────────────────────────
+function exportData() {
+  const data = { exported: new Date().toISOString(), questions: QUESTIONS, entries: ENTRIES };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `innerlijk-export-${dateKey(new Date())}.json`;
+  a.click(); URL.revokeObjectURL(url);
+  showToast('Export gedownload ✓');
+}
+
+function confirmClearData() {
+  openConfirm('Alle data verwijderen','Dit verwijdert al je entries en instellingen. Dit kan niet ongedaan worden gemaakt.','Verwijder alles',()=>{
+    localStorage.removeItem('innerlijk_entries');
+    localStorage.removeItem('innerlijk_questions');
+    localStorage.removeItem('innerlijk_meta');
+    QUESTIONS=loadQuestions(); ENTRIES={}; META=loadMeta();
+    showToast('Alle data verwijderd');
+    showScreen('home');
+  });
+}
+
+// ── CONFIRM DIALOG ────────────────────────────────────
+function openConfirm(title,msg,btnLabel,cb) {
+  confirmCallback=cb;
+  document.getElementById('confirm-title').textContent=title;
+  document.getElementById('confirm-msg').textContent=msg;
+  document.getElementById('confirm-action-btn').textContent=btnLabel;
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+function closeConfirm() { document.getElementById('confirm-overlay').classList.remove('open'); confirmCallback=null; }
+document.getElementById('confirm-action-btn').addEventListener('click',()=>{ closeConfirm(); if(confirmCallback)confirmCallback(); });
+
+// ── TOAST ─────────────────────────────────────────────
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+// ── INIT ──────────────────────────────────────────────
+renderHome();
+</script>
+</body>
+</html>
