@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Innerlijk</title>
+<title>Daily</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
 <style>
@@ -789,7 +789,7 @@ function exportData() {
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
-  a.href = url; a.download = `innerlijk-export-${dateKey(new Date())}.json`;
+  a.href = url; a.download = `daily-export-${dateKey(new Date())}.json`;
   a.click(); URL.revokeObjectURL(url);
   showToast('Export gedownload ✓');
 }
@@ -810,11 +810,12 @@ function openConfirm(title,msg,btnLabel,cb) {
   confirmCallback=cb;
   document.getElementById('confirm-title').textContent=title;
   document.getElementById('confirm-msg').textContent=msg;
-  document.getElementById('confirm-action-btn').textContent=btnLabel;
+  const btn=document.getElementById('confirm-action-btn');
+  btn.textContent=btnLabel;
+  btn.onclick=function(){ var fn=confirmCallback; confirmCallback=null; closeConfirm(); if(fn) fn(); };
   document.getElementById('confirm-overlay').classList.add('open');
 }
 function closeConfirm() { document.getElementById('confirm-overlay').classList.remove('open'); confirmCallback=null; }
-document.getElementById('confirm-action-btn').addEventListener('click',()=>{ closeConfirm(); if(confirmCallback)confirmCallback(); });
 
 // ── TOAST ─────────────────────────────────────────────
 function showToast(msg) {
