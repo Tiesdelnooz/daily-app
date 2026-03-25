@@ -198,9 +198,10 @@ textarea::placeholder{color:var(--ink3);font-style:italic}
 .notif-remove-btn{width:100%;background:transparent;color:var(--ink3);border:none;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;padding:10px}
 
 /* CONFIRM DIALOG */
-.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(26,23,20,.4);z-index:300;backdrop-filter:blur(2px);align-items:flex-end;justify-content:center}
-.confirm-overlay.open{display:flex}
-.confirm-box{background:var(--white);border-radius:22px 22px 0 0;padding:24px 24px 40px;width:100%;max-width:430px;animation:slideSheet .25s cubic-bezier(.22,1,.36,1)}
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(26,23,20,.35);z-index:300;backdrop-filter:blur(2px)}
+.confirm-overlay.open{display:block;animation:fadeOverlay .2s}
+@keyframes fadeOverlay{from{opacity:0}to{opacity:1}}
+.confirm-box{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--white);border-radius:22px 22px 0 0;padding:12px 24px 40px;animation:slideSheet .28s cubic-bezier(.22,1,.36,1)}
 .confirm-title{font-family:'Lora',serif;font-size:17px;margin-bottom:8px}
 .confirm-msg{font-size:13px;color:var(--ink3);margin-bottom:24px;line-height:1.5}
 .confirm-btns{display:flex;flex-direction:column;gap:8px}
@@ -226,7 +227,7 @@ textarea::placeholder{color:var(--ink3);font-style:italic}
       <button class="icon-btn" onclick="showScreen('journey')" title="Journey">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       </button>
-      <button class="icon-btn" onclick="showScreen('settings')" title="Instellingen">
+      <button class="icon-btn" onclick="showScreen('settings')" title="Settings">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
     </div>
@@ -238,7 +239,7 @@ textarea::placeholder{color:var(--ink3);font-style:italic}
   <div class="sticky-spacer"></div>
   <div class="sticky-free-write">
     <button class="free-write-btn" onclick="openWrite(null,null)">
-      Vrij schrijven <span style="font-size:18px;opacity:.6">✦</span>
+      Free write <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="opacity:.7"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
     </button>
   </div>
 </div>
@@ -250,11 +251,11 @@ textarea::placeholder{color:var(--ink3);font-style:italic}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
     </button>
     <span class="write-date" id="write-date-label"></span>
-    <button class="save-btn" onclick="saveEntry()">Opslaan</button>
+    <button class="save-btn" onclick="saveEntry()">Save</button>
   </div>
   <div id="write-question-block"></div>
   <div class="write-area">
-    <textarea id="write-textarea" placeholder="Begin te schrijven..."></textarea>
+    <textarea id="write-textarea" placeholder="Start writing..."></textarea>
   </div>
   <div class="write-footer">
     <span class="word-count" id="word-count">0 woorden</span>
@@ -268,7 +269,7 @@ textarea::placeholder{color:var(--ink3);font-style:italic}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
     </button>
     <span class="entry-detail-meta" id="entry-detail-meta"></span>
-    <button class="entry-delete-btn" onclick="confirmDeleteEntry()">Verwijder</button>
+    <button class="entry-delete-btn" onclick="confirmDeleteEntry()">Delete</button>
   </div>
   <div id="entry-detail-question-block"></div>
   <div class="entry-detail-content" id="entry-detail-content"></div>
@@ -288,11 +289,11 @@ textarea::placeholder{color:var(--ink3);font-style:italic}
   </div>
   <div class="journey-week">
     <div class="journey-week-card">
-      <div class="jw-label">Deze week</div>
+      <div class="jw-label">This week</div>
       <div class="jw-dots" id="jw-dots"></div>
     </div>
   </div>
-  <div class="journey-section-label">Blader door je entries</div>
+  <div class="journey-section-label">Browse your entries</div>
   <div class="journey-cal">
     <div class="j-month-nav">
       <button class="j-month-btn" onclick="changeJourneyMonth(-1)">‹</button>
@@ -308,23 +309,23 @@ textarea::placeholder{color:var(--ink3);font-style:italic}
 <!-- SETTINGS -->
 <div class="screen" id="screen-settings">
   <div class="settings-topbar">
-    <h1>Instellingen</h1>
+    <h1>Settings</h1>
     <button class="close-btn" onclick="showScreen('home')">✕</button>
   </div>
   <div class="privacy-card">
     <div style="font-size:19px;margin-top:1px">🔒</div>
-    <div><h4>Niemand leest mee</h4><p>Jouw entries worden alleen lokaal opgeslagen in deze browser. Nooit gedeeld.</p></div>
+    <div><h4>No one reads along</h4><p>Your entries are stored locally in this browser only. Never shared.</p></div>
   </div>
   <div class="s-section">
-    <div class="s-label">Mijn vragen</div>
+    <div class="s-label">My questions</div>
     <div class="q-settings-list" id="q-settings-list"></div>
-    <button class="add-q-btn" onclick="openAddQuestion()">+ Nieuwe vraag toevoegen</button>
+    <button class="add-q-btn" onclick="openAddQuestion()">+ Add new question</button>
   </div>
   <div class="s-section">
     <div class="s-label">Data</div>
     <div class="s-group">
-      <div class="s-row" onclick="exportData()"><div class="s-row-left"><div class="s-icon" style="background:#F0E4D4">📤</div><span class="s-row-label">Exporteer mijn data</span></div><span class="s-chevron">›</span></div>
-      <div class="s-row" onclick="confirmClearData()"><div class="s-row-left"><div class="s-icon" style="background:#F4EEEE">🗑</div><span class="s-row-label">Verwijder alle data</span></div><span class="s-chevron">›</span></div>
+      <div class="s-row" onclick="exportData()"><div class="s-row-left"><div class="s-icon" style="background:#F0E4D4">📤</div><span class="s-row-label">Export my data</span></div><span class="s-chevron">›</span></div>
+      <div class="s-row" onclick="confirmClearData()"><div class="s-row-left"><div class="s-icon" style="background:#F4EEEE">🗑</div><span class="s-row-label">Delete alle data</span></div><span class="s-chevron">›</span></div>
     </div>
   </div>
   <div class="spacer"></div>
@@ -334,39 +335,40 @@ textarea::placeholder{color:var(--ink3);font-style:italic}
 <div class="sheet-overlay" id="add-q-overlay" onclick="closeAddQuestion()"></div>
 <div class="sheet" id="add-q-sheet" style="display:none">
   <div class="sheet-handle"></div>
-  <div class="sheet-title">Nieuwe vraag</div>
-  <input class="sheet-input" id="new-q-text" placeholder="Schrijf je vraag hier..." maxlength="120">
+  <div class="sheet-title">New question</div>
+  <input class="sheet-input" id="new-q-text" placeholder="Write your question here..." maxlength="120">
   <div class="sheet-freq-row">
-    <button class="freq-btn active" id="freq-dag" onclick="setFreq('Dagelijks')">Dagelijks</button>
-    <button class="freq-btn" id="freq-week" onclick="setFreq('Wekelijks')">Wekelijks</button>
-    <button class="freq-btn" id="freq-maand" onclick="setFreq('Maandelijks')">Maandelijks</button>
+    <button class="freq-btn active" id="freq-dag" onclick="setFreq('Daily')">Daily</button>
+    <button class="freq-btn" id="freq-week" onclick="setFreq('Weekly')">Weekly</button>
+    <button class="freq-btn" id="freq-maand" onclick="setFreq('Monthly')">Monthly</button>
   </div>
-  <button class="sheet-save-btn" onclick="saveNewQuestion()">Vraag toevoegen</button>
+  <button class="sheet-save-btn" onclick="saveNewQuestion()">Add question</button>
 </div>
 
 <!-- NOTIFICATION SHEET -->
 <div class="notif-overlay" id="notif-overlay" onclick="closeNotifSheet()"></div>
 <div class="notif-sheet" id="notif-sheet" style="display:none">
   <div class="sheet-handle"></div>
-  <div class="notif-sheet-title">Melding instellen</div>
+  <div class="notif-sheet-title">Set reminder</div>
   <div class="notif-sheet-sub" id="notif-sheet-sub"></div>
   <div class="time-picker-row">
     <select id="notif-hour"></select>
     <span class="time-colon">:</span>
     <select id="notif-min"></select>
   </div>
-  <button class="notif-save-btn" onclick="saveNotif()">Melding opslaan</button>
-  <button class="notif-remove-btn" id="notif-remove-btn" onclick="removeNotif()">Melding verwijderen</button>
+  <button class="notif-save-btn" onclick="saveNotif()">Save reminder</button>
+  <button class="notif-remove-btn" id="notif-remove-btn" onclick="removeNotif()">Remove reminder</button>
 </div>
 
 <!-- CONFIRM DIALOG -->
 <div class="confirm-overlay" id="confirm-overlay">
   <div class="confirm-box">
+    <div class="sheet-handle"></div>
     <div class="confirm-title" id="confirm-title"></div>
     <div class="confirm-msg" id="confirm-msg"></div>
     <div class="confirm-btns">
       <button class="confirm-del-btn" id="confirm-action-btn"></button>
-      <button class="confirm-cancel-btn" onclick="closeConfirm()">Annuleren</button>
+      <button class="confirm-cancel-btn" onclick="closeConfirm()">Cancel</button>
     </div>
   </div>
 </div>
@@ -375,16 +377,16 @@ textarea::placeholder{color:var(--ink3);font-style:italic}
 
 <script>
 // ── CONSTANTS ────────────────────────────────────────
-const NL_DAYS = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'];
-const NL_DAYS_SHORT = ['Zo','Ma','Di','Wo','Do','Vr','Za'];
-const NL_MONTHS = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+const NL_DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const NL_DAYS_SHORT = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+const NL_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 const DEFAULT_QUESTIONS = [
-  { id: q_id(), text:'Waar ben ik vandaag dankbaar voor?',     freq:'Dagelijks',   notif:null },
-  { id: q_id(), text:'Wat wil ik morgen anders doen?',          freq:'Dagelijks',   notif:null },
-  { id: q_id(), text:'Wat heeft me deze week energie gegeven?', freq:'Wekelijks',   notif:null },
-  { id: q_id(), text:'Wat heeft energie gekost deze week?',     freq:'Wekelijks',   notif:null },
-  { id: q_id(), text:'Ben ik dichter bij mijn doelen gekomen?', freq:'Maandelijks', notif:null },
+  { id: q_id(), text:'What am I grateful for today?',     freq:'Daily',   notif:null },
+  { id: q_id(), text:'What do I want to do differently tomorrow?',          freq:'Daily',   notif:null },
+  { id: q_id(), text:'What gave me energy this week?', freq:'Weekly',   notif:null },
+  { id: q_id(), text:'What cost me energy this week?',     freq:'Weekly',   notif:null },
+  { id: q_id(), text:'Have I moved closer to my goals?', freq:'Monthly', notif:null },
 ];
 
 function q_id() { return 'q_' + Math.random().toString(36).slice(2,9); }
@@ -420,7 +422,7 @@ let currentDate     = new Date(TODAY);
 let journeyMonth    = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
 let selectedJDay    = null;
 let activeNotifIdx  = null;
-let newQFreq        = 'Dagelijks';
+let newQFreq        = 'Daily';
 let entryDetailFrom = 'home'; // 'home' or 'journey'
 let pendingDeleteId = null;
 let pendingDeleteKey= null;
@@ -434,7 +436,7 @@ function isToday(d) { return dateKey(d) === dateKey(TODAY); }
 function fmt_time(d) { return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
 function greeting() {
   const h = TODAY.getHours();
-  return h < 12 ? 'Goedemorgen' : h < 18 ? 'Goedemiddag' : 'Goedenavond';
+  return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
 }
 function entryDates() { return new Set(Object.keys(ENTRIES).filter(k => ENTRIES[k] && ENTRIES[k].length > 0)); }
 function totalEntries() { return Object.values(ENTRIES).reduce((s,a) => s + a.length, 0); }
@@ -492,7 +494,7 @@ function renderDaySlide() {
   }
 
   if (dayEntries.length > 0) {
-    if (isT) html += `<div class="day-entries-label">Geschreven vandaag</div>`;
+    if (isT) html += `<div class="day-entries-label">Written today</div>`;
     dayEntries.forEach(e => {
       html += `<div class="entry-item" onclick="openEntryDetail('${key}','${e.id}','home')">
         <div class="entry-body"><div class="entry-title">${e.title}</div><div class="entry-preview">${esc(e.text)}</div></div>
@@ -500,9 +502,9 @@ function renderDaySlide() {
       </div>`;
     });
   } else if (!isT) {
-    html += `<div class="empty-state">Geen entries op deze dag.</div>`;
+    html += `<div class="empty-state">No entries on this day.</div>`;
   }
-  if (!isT) html += `<div class="swipe-hint">← swipe terug naar vandaag</div>`;
+  if (!isT) html += `<div class="swipe-hint">← swipe back to today</div>`;
   document.getElementById('day-slide').innerHTML = html;
 }
 
@@ -540,9 +542,9 @@ function openWrite(question, freq, qid) {
   const block = document.getElementById('write-question-block');
   block.innerHTML = question
     ? `<div class="write-q-block"><div class="wq-label">${freq}</div><div class="wq-text">${esc(question)}</div><div class="write-sep"></div></div>`
-    : `<div class="write-q-block"><div class="wq-label" style="color:var(--ink3)">Vrij schrijven</div><div class="write-sep"></div></div>`;
+    : `<div class="write-q-block"><div class="wq-label" style="color:var(--ink3)">Free write</div><div class="write-sep"></div></div>`;
   document.getElementById('write-textarea').value = '';
-  document.getElementById('word-count').textContent = '0 woorden';
+  document.getElementById('word-count').textContent = '0 words';
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-write').classList.add('active');
   setTimeout(()=>document.getElementById('write-textarea').focus(),320);
@@ -550,12 +552,12 @@ function openWrite(question, freq, qid) {
 
 document.getElementById('write-textarea').addEventListener('input',function(){
   const w=this.value.trim()?this.value.trim().split(/\s+/).length:0;
-  document.getElementById('word-count').textContent=w+(w===1?' woord':' woorden');
+  document.getElementById('word-count').textContent=w+(w===1?' word':' words');
 });
 
 function saveEntry() {
   const text = document.getElementById('write-textarea').value.trim();
-  if (!text) { showToast('Schrijf eerst iets'); return; }
+  if (!text) { showToast('Write something first'); return; }
 
   const key = dateKey(currentDate);
   if (!ENTRIES[key]) ENTRIES[key] = [];
@@ -564,7 +566,7 @@ function saveEntry() {
   const qBlock = document.getElementById('write-question-block');
   const qLabel = qBlock.querySelector('.wq-label');
   const qText  = qBlock.querySelector('.wq-text');
-  const title  = qText ? qText.textContent.slice(0,40) : 'Vrij schrijven';
+  const title  = qText ? qText.textContent.slice(0,40) : 'Free write';
 
   const entry = {
     id:    e_id(),
@@ -576,7 +578,7 @@ function saveEntry() {
   };
   ENTRIES[key].push(entry);
   saveEntries(ENTRIES);
-  showToast('Opgeslagen ✓');
+  showToast('Saved ✓');
   setTimeout(()=>showScreen('home'), 800);
 }
 
@@ -595,7 +597,7 @@ function openEntryDetail(dateK, entryId, from) {
     const q = QUESTIONS.find(q=>q.id===e.qid);
     qblock.innerHTML = q ? `<div class="entry-detail-question"><div class="entry-detail-q-label">${q.freq}</div><div class="entry-detail-q-text">${esc(q.text)}</div><div class="entry-detail-divider"></div></div>` : '';
   } else {
-    qblock.innerHTML = `<div class="entry-detail-question"><div class="entry-detail-q-label" style="color:var(--ink3)">Vrij schrijven</div><div class="entry-detail-divider"></div></div>`;
+    qblock.innerHTML = `<div class="entry-detail-question"><div class="entry-detail-q-label" style="color:var(--ink3)">Free write</div><div class="entry-detail-divider"></div></div>`;
   }
 
   document.getElementById('entry-detail-content').textContent = e.text;
@@ -611,14 +613,14 @@ function closeEntryDetail() {
 
 function confirmDeleteEntry() {
   openConfirm(
-    'Entry verwijderen',
-    'Dit kan niet ongedaan worden gemaakt.',
-    'Verwijderen',
+    'Delete entry',
+    'This cannot be undone.',
+    'Delete',
     () => {
       ENTRIES[pendingDeleteKey] = (ENTRIES[pendingDeleteKey]||[]).filter(e=>e.id!==pendingDeleteId);
       if (ENTRIES[pendingDeleteKey].length === 0) delete ENTRIES[pendingDeleteKey];
       saveEntries(ENTRIES);
-      showToast('Verwijderd');
+      showToast('Deleted');
       closeEntryDetail();
     }
   );
@@ -631,7 +633,7 @@ function renderJourney() {
   document.getElementById('jt-number').textContent = total;
   const meta = loadMeta();
   const sd = new Date(meta.startDate);
-  document.getElementById('jt-label').textContent = `entries geschreven sinds ${NL_MONTHS[sd.getMonth()]} ${sd.getFullYear()}`;
+  document.getElementById('jt-label').textContent = `entries written since ${NL_MONTHS[sd.getMonth()]} ${sd.getFullYear()}`;
 
   renderWeekDotsJourney();
   renderJourneyCalendar();
@@ -688,7 +690,7 @@ function renderJourneyDayEntries(d) {
   const dk=dateKey(d), entries=ENTRIES[dk]||[];
   const label=`${NL_DAYS[d.getDay()]} ${d.getDate()} ${NL_MONTHS[d.getMonth()]}`;
   if(entries.length===0){
-    container.innerHTML=`<div class="journey-day-header">${label}</div><div class="journey-day-empty">Geen entries op deze dag.</div>`;
+    container.innerHTML=`<div class="journey-day-header">${label}</div><div class="journey-day-empty">No entries on this day.</div>`;
     return;
   }
   let html=`<div class="journey-day-header">${label}</div>`;
@@ -709,22 +711,22 @@ function renderQSettings() {
     const notifHTML=q.notif
       ? `<span class="qs-notif" onclick="openNotifSheet(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>${q.notif}</span>`
       : `<span class="qs-notif-add" onclick="openNotifSheet(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>+</span>`;
-    return `<div class="q-settings-item"><span class="qs-freq">${q.freq}</span><span class="qs-text">${esc(q.text)}</span>${notifHTML}<span class="qs-drag" onclick="removeQuestion(${i})" title="Verwijder vraag" style="cursor:pointer;font-size:18px;color:var(--ink3)">×</span></div>`;
+    return `<div class="q-settings-item"><span class="qs-freq">${q.freq}</span><span class="qs-text">${esc(q.text)}</span>${notifHTML}<span class="qs-drag" onclick="removeQuestion(${i})" title="Delete vraag" style="cursor:pointer;font-size:18px;color:var(--ink3)">×</span></div>`;
   }).join('');
 }
 
 function removeQuestion(idx) {
-  openConfirm('Vraag verwijderen','Eerder opgeslagen entries die aan deze vraag zijn gekoppeld blijven bewaard.','Verwijderen',()=>{
+  openConfirm('Delete question','Previously saved entries linked to this question will be kept.','Delete',()=>{
     QUESTIONS.splice(idx,1);
     saveQuestions(QUESTIONS);
     renderQSettings();
-    showToast('Vraag verwijderd');
+    showToast('Question deleted');
   });
 }
 
 // ── ADD QUESTION ──────────────────────────────────────
 function openAddQuestion() {
-  newQFreq='Dagelijks';
+  newQFreq='Daily';
   document.getElementById('new-q-text').value='';
   ['dag','week','maand'].forEach(f=>document.getElementById('freq-'+f).classList.remove('active'));
   document.getElementById('freq-dag').classList.add('active');
@@ -738,18 +740,18 @@ function closeAddQuestion() {
 }
 function setFreq(f) {
   newQFreq=f;
-  const map={'Dagelijks':'dag','Wekelijks':'week','Maandelijks':'maand'};
+  const map={'Daily':'dag','Weekly':'week','Monthly':'maand'};
   ['dag','week','maand'].forEach(k=>document.getElementById('freq-'+k).classList.remove('active'));
   document.getElementById('freq-'+map[f]).classList.add('active');
 }
 function saveNewQuestion() {
   const text=document.getElementById('new-q-text').value.trim();
-  if(!text){showToast('Vul een vraag in');return;}
+  if(!text){showToast('Please enter a question');return;}
   QUESTIONS.push({id:q_id(),text,freq:newQFreq,notif:null});
   saveQuestions(QUESTIONS);
   closeAddQuestion();
   renderQSettings();
-  showToast('Vraag toegevoegd ✓');
+  showToast('Question added ✓');
 }
 
 // ── NOTIFICATIONS ─────────────────────────────────────
@@ -775,12 +777,12 @@ function saveNotif() {
   const m=document.getElementById('notif-min').value;
   QUESTIONS[activeNotifIdx].notif=`${h}:${m}`;
   saveQuestions(QUESTIONS);
-  closeNotifSheet();renderQSettings();showToast('Melding opgeslagen ✓');
+  closeNotifSheet();renderQSettings();showToast('Reminder saved ✓');
 }
 function removeNotif() {
   QUESTIONS[activeNotifIdx].notif=null;
   saveQuestions(QUESTIONS);
-  closeNotifSheet();renderQSettings();showToast('Melding verwijderd');
+  closeNotifSheet();renderQSettings();showToast('Reminder removed');
 }
 
 // ── EXPORT ────────────────────────────────────────────
@@ -791,16 +793,16 @@ function exportData() {
   const a    = document.createElement('a');
   a.href = url; a.download = `daily-export-${dateKey(new Date())}.json`;
   a.click(); URL.revokeObjectURL(url);
-  showToast('Export gedownload ✓');
+  showToast('Export downloaded ✓');
 }
 
 function confirmClearData() {
-  openConfirm('Alle data verwijderen','Dit verwijdert al je entries en instellingen. Dit kan niet ongedaan worden gemaakt.','Verwijder alles',()=>{
+  openConfirm('Delete all data','This deletes all your entries and settings. This cannot be undone.','Delete everything',()=>{
     localStorage.removeItem('innerlijk_entries');
     localStorage.removeItem('innerlijk_questions');
     localStorage.removeItem('innerlijk_meta');
     QUESTIONS=loadQuestions(); ENTRIES={}; META=loadMeta();
-    showToast('Alle data verwijderd');
+    showToast('All data deleted');
     showScreen('home');
   });
 }
@@ -826,6 +828,21 @@ function showToast(msg) {
 
 // ── INIT ──────────────────────────────────────────────
 renderHome();
+// Open write screen directly via URL parameter
+// ?write        → vrij schrijven
+// ?write=0      → eerste vraag
+// ?write=1      → tweede vraag, etc.
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('write')) {
+  const idx = urlParams.get('write');
+  if (idx === '' || idx === null) {
+    openWrite(null, null);
+  } else {
+    const q = QUESTIONS[parseInt(idx)];
+    if (q) openWrite(q.text, q.freq, q.id);
+    else openWrite(null, null);
+  }
+}
 </script>
 </body>
 </html>
